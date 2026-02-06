@@ -54,16 +54,20 @@ let resizeObserver
 
 const lineCount = computed(() => {
   const width = containerWidth.value
-  if (width >= 900) {
-    return 90
-  }
-  if (width >= 600) {
+  console.log(width)
+  if (width >= 700) {
     return 60
+  }
+  if (width >= 550) {
+    return 45
   }
   if (width >= 360) {
     return 30
   }
-  return 10
+  if (width >= 300) {
+    return 20
+  }
+  return 15
 })
 
 const displayData = computed(() => {
@@ -149,7 +153,7 @@ onBeforeUnmount(() => {
 }
 
 .status-tracker__line {
-  width: 1rem;
+  width: .5rem;
   height: 2rem;
   background-color: #4caf50;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
