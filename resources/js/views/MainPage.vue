@@ -9,6 +9,10 @@
       </header>
       <v-card class="placeholder-card" elevation="6">
         <v-card-text>
+          <div class="status-row">
+            <span class="status-label">Status</span>
+            <StatusIndicator state="green" />
+          </div>
           text
         </v-card-text>
       </v-card>
@@ -19,6 +23,7 @@
 <script setup>
 import { VApp, VCard, VCardText, VContainer } from 'vuetify/components'
 import logo from '../../assets/LogoSteinmn.png'
+import StatusIndicator from './components/StatusIndicator.vue'
 </script>
 
 <style scoped>
@@ -57,6 +62,18 @@ import logo from '../../assets/LogoSteinmn.png'
   height: 4rem;
   background: transparent;
   margin-bottom: 2rem;
+}
+
+.status-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.status-label {
+  font-weight: 600;
+  letter-spacing: 0.02em;
 }
 
 .logo-placeholder {
