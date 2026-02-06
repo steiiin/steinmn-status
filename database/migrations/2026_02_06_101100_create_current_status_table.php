@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->timestamps();
 
-            // wann kam zuletzt ein Heartbeat JSON an?
             $table->dateTimeTz('last_heartbeat_at')->nullable();
+            $table->boolean('system_available');
 
             // thermal
             $table->string('thermal_range')->nullable();        // HIGH|MEDIUM|LOW
