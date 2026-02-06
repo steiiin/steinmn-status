@@ -107,6 +107,7 @@ const statusData = [
   align-items: center;
   gap: 2rem;
   padding: 2rem;
+  line-height: 1.1;
 }
 
 .container-status-row {
@@ -114,6 +115,7 @@ const statusData = [
   align-items: center;
   gap: 1.5rem;
   padding: .7rem .75rem;
+  line-height: 1.1;
 }
 
 .status-row {
@@ -121,6 +123,7 @@ const statusData = [
   align-items: center;
   gap: 0.75rem;
   margin-bottom: 1rem;
+  line-height: 1.1;
 }
 
 .label-huge {

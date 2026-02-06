@@ -41,6 +41,7 @@ const dotStyle = computed(() => `width:${dotSize.value}rem;height:${dotSize.valu
   width: var(--indicator-size);
   height: var(--indicator-size);
   border-radius: 999px;
+  flex-shrink: 0;
   background-color: currentColor;
 }
 

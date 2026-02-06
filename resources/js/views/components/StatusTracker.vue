@@ -30,6 +30,10 @@
         </div>
       </template>
     </div>
+    <div class="status-tracker__labels">
+      <div class="left">{{ lineCount }}d</div>
+      <div class="right">Heute</div>
+    </div>
   </div>
 </template>
 
@@ -54,20 +58,19 @@ let resizeObserver
 
 const lineCount = computed(() => {
   const width = containerWidth.value
-  console.log(width)
-  if (width >= 700) {
-    return 60
-  }
-  if (width >= 550) {
-    return 45
-  }
-  if (width >= 360) {
-    return 30
-  }
-  if (width >= 300) {
-    return 20
-  }
-  return 15
+  const minWidth = 150
+  const maxWidth = 700
+  const minValue = 10
+  const maxValue = 60
+
+  const clampedWidth = Math.min(Math.max(width, minWidth), maxWidth)
+
+  const count = Math.round(
+    minValue +
+      ((clampedWidth - minWidth) / (maxWidth - minWidth)) *
+        (maxValue - minValue)
+  )
+  return Math.round(count / 5) * 5
 })
 
 const displayData = computed(() => {
@@ -193,6 +196,13 @@ onBeforeUnmount(() => {
 .status-tracker__popover-body {
   font-size: 0.85rem;
   line-height: 1.2;
+}
+
+.status-tracker__labels {
+  display: flex;
+  justify-content: space-between;
+  color: #c7c7c7;
+  font-size: .9em;
 }
 
 </style>
