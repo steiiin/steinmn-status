@@ -1,5 +1,5 @@
 <template>
-  <div class="status-tracker">
+  <div class="status-tracker" ref="containerRef">
     <div class="status-tracker__lines">
       <template v-for="item in displayData" :key="item.key">
         <VMenu
@@ -34,7 +34,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { VCard, VCardText, VMenu } from 'vuetify/components'
 
 const props = defineProps({
@@ -48,12 +48,31 @@ const sortedData = computed(() =>
   [...props.data].sort((a, b) => new Date(b.date) - new Date(a.date)),
 )
 
+const containerRef = ref(null)
+const containerWidth = ref(0)
+let resizeObserver
+
+const lineCount = computed(() => {
+  const width = containerWidth.value
+  if (width >= 900) {
+    return 90
+  }
+  if (width >= 600) {
+    return 60
+  }
+  if (width >= 360) {
+    return 30
+  }
+  return 10
+})
+
 const displayData = computed(() => {
-  const trimmed = sortedData.value.slice(0, 30).map((item, index) => ({
+  const count = lineCount.value
+  const trimmed = sortedData.value.slice(0, count).map((item, index) => ({
     ...item,
     key: item.date ?? `missing-${index}`,
   }))
-  const fillers = Array.from({ length: Math.max(0, 30 - trimmed.length) }, (_, i) => ({
+  const fillers = Array.from({ length: Math.max(0, count - trimmed.length) }, (_, i) => ({
     key: `missing-${trimmed.length + i}`,
     date: null,
     availability_p: null,
@@ -83,6 +102,28 @@ const lineClass = (item) => {
 const formatAvailability = (value) => `${(value * 100).toFixed(3)}%`
 const formatResponseTime = (value) => `${Math.round(value)} ms`
 const formatDate = (value) => value ?? 'Unknown'
+
+onMounted(() => {
+  if (!containerRef.value || typeof ResizeObserver === 'undefined') {
+    return
+  }
+
+  resizeObserver = new ResizeObserver((entries) => {
+    const entry = entries[0]
+    if (entry) {
+      containerWidth.value = entry.contentRect.width
+    }
+  })
+
+  resizeObserver.observe(containerRef.value)
+  containerWidth.value = containerRef.value.getBoundingClientRect().width
+})
+
+onBeforeUnmount(() => {
+  if (resizeObserver) {
+    resizeObserver.disconnect()
+  }
+})
 </script>
 
 <style scoped>
