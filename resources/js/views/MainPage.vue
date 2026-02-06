@@ -15,7 +15,6 @@
 </template>
 
 <script setup>
-import 'vuetify/styles'
 import { VApp, VCard, VCardText, VContainer } from 'vuetify/components'
 </script>
 
