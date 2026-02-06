@@ -1,6 +1,5 @@
 <template>
   <v-app class="main-page">
-    <div class="background-bar" aria-hidden="true"></div>
     <v-container class="content-container" fluid>
       <header class="main-header">
         <a class="main-header--logo" href="/">
@@ -11,12 +10,10 @@
         <v-card class="status-card">
           <v-card-text class="overall-status-row">
             <StatusIndicator state="green" size="huge" />
-            <span class="label-huge">Alles in Ordnung.</span>
-          </v-card-text>
-        </v-card>
-        <v-card class="status-card">
-          <v-card-text>
-            <StatusTracker :data="statusData" />
+            <div style="display:flex;flex-direction:column;">
+              <span class="label-huge">Alles in Ordnung.</span>
+              <span class="label-subtitle">Letztes Update: <b>Vor 30min</b></span>
+            </div>
           </v-card-text>
         </v-card>
         <v-card class="status-card" style="padding-left: .5rem">
@@ -35,16 +32,59 @@
             </div>
           </v-card-text>
         </v-card>
+        <v-card class="status-card">
+          <v-card-text>
+            <StatusTracker :data="statusData" />
+          </v-card-text>
+        </v-card>
+        <v-card class="status-card">
+          <v-card-text style="display:flex;flex-direction:column;gap:.5rem;">
+
+            <current-container title="Server">
+              <current-com-temp :state="{
+                thermal_range: 'LOW', thermal_temperature: 40
+              }"></current-com-temp>
+              <current-com-encryption :ok="true">
+              </current-com-encryption>
+            </current-container>
+
+            <current-container title="Festplatten">
+              <current-com-hdd label="HDDa" :state="{
+                ok: true, health: true, free_p: 0.19
+              }"></current-com-hdd>
+              <current-com-hdd label="HDDb" :state="{
+                ok: true, health: false, free_p: 0.19
+              }"></current-com-hdd>
+            </current-container>
+
+            <current-container title="Services">
+              <current-com-service
+                label="Docker" icon="docker"
+                :ok="true">
+              </current-com-service>
+              <current-com-service
+                label="Proxy" icon="arrow-decision-outline"
+                :ok="true">
+              </current-com-service>
+            </current-container>
+
+          </v-card-text>
+        </v-card>
       </div>
     </v-container>
   </v-app>
 </template>
 
 <script setup>
-import { VApp, VCard, VCardText, VContainer } from 'vuetify/components'
+import { VApp, VCard, VCardText, VContainer, VChip } from 'vuetify/components'
 import logo from '../../assets/LogoSteinmn.png'
 import StatusIndicator from './components/StatusIndicator.vue'
 import StatusTracker from './components/StatusTracker.vue'
+import CurrentContainer from './components/CurrentContainer.vue'
+import CurrentComTemp from './components/CurrentComTemp.vue'
+import CurrentComHdd from './components/CurrentComHdd.vue'
+import CurrentComEncryption from './components/CurrentComEncryption.vue'
+import CurrentComService from './components/CurrentComService.vue'
 
 const statusData = [
   { date: '2025-02-10', availability_p: 0.9991, avg_response_time_ms: 210 },
@@ -64,14 +104,8 @@ const statusData = [
   color: #fff;
 }
 
-.background-bar {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 12rem;
-  background: linear-gradient(180deg, #f9f9f9 0%, #bdbdbd 100%);
-  z-index: 0;
+.main-header--logo {
+  border: 1px solid #fff;
 }
 
 .content-container {

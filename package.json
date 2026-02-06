@@ -7,14 +7,15 @@
         "dev": "vite"
     },
     "devDependencies": {
-        "@vitejs/plugin-vue": "^6.0.1",
+        "@mdi/font": "^7.4.47",
         "@tailwindcss/vite": "^4.0.0",
+        "@vitejs/plugin-vue": "^6.0.1",
         "axios": "^1.11.0",
         "concurrently": "^9.0.1",
         "laravel-vite-plugin": "^2.0.0",
         "tailwindcss": "^4.0.0",
-        "vue": "^3.5.21",
-        "vite": "^7.3.1"
+        "vite": "^7.3.1",
+        "vue": "^3.5.21"
     },
     "dependencies": {
         "vuetify": "^3.10.1"

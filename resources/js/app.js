@@ -1,5 +1,6 @@
 import './bootstrap';
 import 'vuetify/styles';
+import '@mdi/font/css/materialdesignicons.css'
 import { createApp } from 'vue';
 import { createVuetify } from 'vuetify';
 import MainPage from './views/MainPage.vue';

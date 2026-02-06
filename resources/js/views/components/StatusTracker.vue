@@ -30,7 +30,7 @@
         </div>
       </template>
     </div>
-    <div class="status-tracker__labels">
+    <div class="status-tracker__labels" v-if="false">
       <div class="left">{{ lineCount }}d</div>
       <div class="right">Heute</div>
     </div>
