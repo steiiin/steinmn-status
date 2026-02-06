@@ -7,15 +7,35 @@
           <img :src="logo">
         </a>
       </header>
-      <v-card class="placeholder-card" elevation="6">
-        <v-card-text>
-          <div class="status-row">
-            <span class="status-label">Status</span>
-            <StatusIndicator state="green" />
-          </div>
-          text
-        </v-card-text>
-      </v-card>
+      <div class="status-card-container">
+        <v-card class="status-card">
+          <v-card-text class="overall-status-row">
+            <StatusIndicator state="green" size="huge" />
+            <span class="label-huge">Alles in Ordnung.</span>
+          </v-card-text>
+        </v-card>
+        <v-card class="status-card">
+          <v-card-text>
+            Here comes StatusTracker.
+          </v-card-text>
+        </v-card>
+        <v-card class="status-card" style="padding-left: .5rem">
+          <v-card-text>
+            <div class="container-status-row">
+              <StatusIndicator state="green" size="normal" />
+              <span class="label-large">BÜRO aktiv.</span>
+            </div>
+            <div class="container-status-row">
+              <StatusIndicator state="green" size="normal" />
+              <span class="label-large">DOKUMENTE aktiv.</span>
+            </div>
+            <div class="container-status-row">
+              <StatusIndicator state="green" size="normal" />
+              <span class="label-large">MEDIEN aktiv.</span>
+            </div>
+          </v-card-text>
+        </v-card>
+      </div>
     </v-container>
   </v-app>
 </template>
@@ -40,7 +60,7 @@ import StatusIndicator from './components/StatusIndicator.vue'
   top: 0;
   left: 0;
   width: 100%;
-  height: 25vh;
+  height: 12rem;
   background: linear-gradient(180deg, #f9f9f9 0%, #bdbdbd 100%);
   z-index: 0;
 }
@@ -64,6 +84,29 @@ import StatusIndicator from './components/StatusIndicator.vue'
   margin-bottom: 2rem;
 }
 
+.status-card-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.status-card {
+  border-radius: 0rem;
+}
+
+.overall-status-row {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  padding: 2rem;
+}
+
+.container-status-row {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: .7rem .75rem;
+}
+
 .status-row {
   display: flex;
   align-items: center;
@@ -71,20 +114,15 @@ import StatusIndicator from './components/StatusIndicator.vue'
   margin-bottom: 1rem;
 }
 
-.status-label {
+.label-huge {
   font-weight: 600;
-  letter-spacing: 0.02em;
+  letter-spacing: 1px;
+  font-size: 1.5rem;
 }
 
-.logo-placeholder {
-  width: 140px;
-  height: 32px;
-  border: 1px dashed rgba(255, 255, 255, 0.5);
-  border-radius: 6px;
+.label-large {
+  font-weight: 600;
+  font-size: 1.2rem;
 }
-/*
-.placeholder-card {
-  background-color: rgba(15, 23, 42, 0.85);
-  color: #fff;
-} */
+
 </style>
