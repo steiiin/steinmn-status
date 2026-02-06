@@ -1,0 +1,159 @@
+<template>
+  <div class="status-tracker">
+    <div class="status-tracker__lines">
+      <template v-for="item in displayData" :key="item.key">
+        <VMenu
+          v-if="isHoverable(item)"
+          location="top"
+          open-on-hover
+        >
+          <template #activator="{ props }">
+            <div class="status-tracker__line-wrapper" v-bind="props">
+              <div
+                class="status-tracker__line"
+                :class="lineClass(item)"
+              ></div>
+            </div>
+          </template>
+          <VCard class="status-tracker__popover" elevation="6">
+            <VCardText>
+              <div class="status-tracker__popover-date">{{ formatDate(item.date) }}</div>
+              <div class="status-tracker__popover-body">
+                <div>Availability: {{ formatAvailability(item.availability_p) }}</div>
+                <div>Avg response: {{ formatResponseTime(item.avg_response_time_ms) }}</div>
+              </div>
+            </VCardText>
+          </VCard>
+        </VMenu>
+        <div v-else class="status-tracker__line-wrapper is-disabled">
+          <div class="status-tracker__line is-missing"></div>
+        </div>
+      </template>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { computed } from 'vue'
+import { VCard, VCardText, VMenu } from 'vuetify/components'
+
+const props = defineProps({
+  data: {
+    type: Array,
+    default: () => [],
+  },
+})
+
+const sortedData = computed(() =>
+  [...props.data].sort((a, b) => new Date(b.date) - new Date(a.date)),
+)
+
+const displayData = computed(() => {
+  const trimmed = sortedData.value.slice(0, 30).map((item, index) => ({
+    ...item,
+    key: item.date ?? `missing-${index}`,
+  }))
+  const fillers = Array.from({ length: Math.max(0, 30 - trimmed.length) }, (_, i) => ({
+    key: `missing-${trimmed.length + i}`,
+    date: null,
+    availability_p: null,
+    avg_response_time_ms: null,
+  }))
+  return [...trimmed, ...fillers]
+})
+
+const hasData = (item) =>
+  Number.isFinite(item.availability_p) && Number.isFinite(item.avg_response_time_ms)
+
+const isHoverable = (item) => hasData(item) && Boolean(item.date)
+
+const lineClass = (item) => {
+  if (!hasData(item)) {
+    return 'is-missing'
+  }
+  if (item.availability_p > 0.998) {
+    return 'is-green'
+  }
+  if (item.availability_p > 0.99) {
+    return 'is-yellow'
+  }
+  return 'is-red'
+}
+
+const formatAvailability = (value) => `${(value * 100).toFixed(3)}%`
+const formatResponseTime = (value) => `${Math.round(value)} ms`
+const formatDate = (value) => value ?? 'Unknown'
+</script>
+
+<style scoped>
+.status-tracker {
+  width: 100%;
+  padding: 0.75rem 0.5rem 0.5rem;
+}
+
+.status-tracker__lines {
+  display: flex;
+  flex-direction: row-reverse;
+  gap: 0.5rem;
+  align-items: flex-end;
+  justify-content: flex-start;
+  min-height: 4rem;
+}
+
+.status-tracker__line-wrapper {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0.15rem 0.1rem;
+}
+
+.status-tracker__line-wrapper.is-disabled {
+  cursor: default;
+}
+
+.status-tracker__line {
+  width: 8px;
+  height: 3.5rem;
+  border-radius: 999px;
+  background-color: #4caf50;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.status-tracker__line-wrapper:not(.is-disabled):hover .status-tracker__line {
+  transform: translateY(-4px);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.45);
+}
+
+.status-tracker__line.is-green {
+  background-color: #4caf50;
+}
+
+.status-tracker__line.is-yellow {
+  background-color: #f4c430;
+}
+
+.status-tracker__line.is-red {
+  background-color: #ef5350;
+}
+
+.status-tracker__line.is-missing {
+  background-color: #9e9e9e;
+}
+
+.status-tracker__popover {
+  background: #111;
+  color: #fff;
+  border-radius: 0.75rem;
+  min-width: 180px;
+}
+
+.status-tracker__popover-date {
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.status-tracker__popover-body {
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+</style>

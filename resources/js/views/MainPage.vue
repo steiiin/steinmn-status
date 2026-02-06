@@ -16,7 +16,7 @@
         </v-card>
         <v-card class="status-card">
           <v-card-text>
-            Here comes StatusTracker.
+            <StatusTracker :data="statusData" />
           </v-card-text>
         </v-card>
         <v-card class="status-card" style="padding-left: .5rem">
@@ -44,6 +44,15 @@
 import { VApp, VCard, VCardText, VContainer } from 'vuetify/components'
 import logo from '../../assets/LogoSteinmn.png'
 import StatusIndicator from './components/StatusIndicator.vue'
+import StatusTracker from './components/StatusTracker.vue'
+
+const statusData = [
+  { date: '2025-02-10', availability_p: 0.9991, avg_response_time_ms: 210 },
+  { date: '2025-02-09', availability_p: 0.9985, avg_response_time_ms: 240 },
+  { date: '2025-02-08', availability_p: 0.993, avg_response_time_ms: 320 },
+  { date: '2025-02-07', availability_p: 0.987, avg_response_time_ms: 410 },
+  { date: '2025-02-06', availability_p: null, avg_response_time_ms: null },
+]
 </script>
 
 <style scoped>
