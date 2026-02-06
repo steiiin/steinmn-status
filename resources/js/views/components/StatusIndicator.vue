@@ -2,26 +2,42 @@
   <span
     class="status-indicator"
     :class="`status-indicator--${state}`"
-    role="status"
+    role="status" :style="dotStyle"
     :aria-label="`${state} status`"
   ></span>
 </template>
 
 <script setup>
+import { computed } from 'vue';
+
 const props = defineProps({
   state: {
     type: String,
     default: 'green',
     validator: (value) => ['green', 'yellow', 'red'].includes(value),
   },
+  size: {
+    type: String,
+    default: 'normal',
+    validator: (value) => ['normal', 'small', 'huge'].includes(value),
+  },
 })
+
+const sizeValues = {
+  small: 0.9,
+  normal: 1.8,
+  huge: 3.0,
+}
+
+const dotSize = computed(() => sizeValues[props.size])
+const dotStyle = computed(() => `width:${dotSize.value}rem;height:${dotSize.value}rem`)
+
 </script>
 
 <style scoped>
 .status-indicator {
-  --indicator-size: 0.9rem;
   position: relative;
-  display: inline-flex;
+  display: flex;
   width: var(--indicator-size);
   height: var(--indicator-size);
   border-radius: 999px;
@@ -51,48 +67,36 @@ const props = defineProps({
 }
 
 .status-indicator--green::after {
-  animation: green-pulse 1.1s ease-out infinite;
+  animation: dot-pulse 2.0s ease-out infinite;
 }
 
 .status-indicator--yellow::after {
-  animation: yellow-pulse 1.8s ease-out infinite;
+  animation: dot-pulse 4.0s ease-out infinite;
 }
 
 .status-indicator--red::after {
-  opacity: 0.55;
-  animation: red-breath 2.6s ease-in-out infinite alternate;
+  animation: dot-breath 2.6s ease-in-out infinite alternate;
 }
 
-@keyframes green-pulse {
-  0% {
-    opacity: 0.6;
-    transform: scale(1);
-  }
-  100% {
-    opacity: 0;
-    transform: scale(2.1);
-  }
-}
-
-@keyframes yellow-pulse {
+@keyframes dot-pulse {
   0% {
     opacity: 0.5;
     transform: scale(1);
   }
   100% {
     opacity: 0;
-    transform: scale(2.4);
+    transform: scale(2);
   }
 }
 
-@keyframes red-breath {
+@keyframes dot-breath {
   0% {
-    opacity: 0.65;
-    transform: scale(0.95);
+    opacity: 0.1;
+    transform: scale(1.2);
   }
   100% {
-    opacity: 0.35;
-    transform: scale(1.45);
+    opacity: 0.4;
+    transform: scale(1.5);
   }
 }
 </style>
