@@ -18,7 +18,7 @@
 
 <script setup>
 import { VApp, VCard, VCardText, VContainer } from 'vuetify/components'
-import logo from '@/assets/LogoSteinmn.png'
+import logo from '../../assets/LogoSteinmn.png'
 </script>
 
 <style scoped>
