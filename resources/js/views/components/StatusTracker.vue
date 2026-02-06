@@ -19,8 +19,8 @@
             <VCardText>
               <div class="status-tracker__popover-date">{{ formatDate(item.date) }}</div>
               <div class="status-tracker__popover-body">
-                <div>Availability: {{ formatAvailability(item.availability_p) }}</div>
-                <div>Avg response: {{ formatResponseTime(item.avg_response_time_ms) }}</div>
+                <div>Online: {{ formatAvailability(item.availability_p) }}</div>
+                <div>Antwortzeit: {{ formatResponseTime(item.avg_response_time_ms) }}</div>
               </div>
             </VCardText>
           </VCard>
@@ -88,23 +88,19 @@ const formatDate = (value) => value ?? 'Unknown'
 <style scoped>
 .status-tracker {
   width: 100%;
-  padding: 0.75rem 0.5rem 0.5rem;
 }
 
 .status-tracker__lines {
   display: flex;
   flex-direction: row-reverse;
-  gap: 0.5rem;
   align-items: flex-end;
-  justify-content: flex-start;
-  min-height: 4rem;
+  justify-content: space-between;
 }
 
 .status-tracker__line-wrapper {
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  padding: 0.15rem 0.1rem;
 }
 
 .status-tracker__line-wrapper.is-disabled {
@@ -112,9 +108,8 @@ const formatDate = (value) => value ?? 'Unknown'
 }
 
 .status-tracker__line {
-  width: 8px;
-  height: 3.5rem;
-  border-radius: 999px;
+  width: 1rem;
+  height: 2rem;
   background-color: #4caf50;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
@@ -137,12 +132,10 @@ const formatDate = (value) => value ?? 'Unknown'
 }
 
 .status-tracker__line.is-missing {
-  background-color: #9e9e9e;
+  background-color: #ededed;
 }
 
 .status-tracker__popover {
-  background: #111;
-  color: #fff;
   border-radius: 0.75rem;
   min-width: 180px;
 }
@@ -154,6 +147,7 @@ const formatDate = (value) => value ?? 'Unknown'
 
 .status-tracker__popover-body {
   font-size: 0.85rem;
-  line-height: 1.4;
+  line-height: 1.2;
 }
+
 </style>
