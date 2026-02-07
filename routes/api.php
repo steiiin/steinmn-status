@@ -1,10 +1,11 @@
 <?php
 
 use App\Models\CurrentStatus;
+use App\Services\StatusService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-Route::post('/heartbeat', function (Request $request) {
+Route::post('/heartbeat', function (Request $request, StatusService $ss) {
 
   # validate bearer
   $providedToken = $request->bearerToken();
@@ -83,7 +84,7 @@ Route::post('/heartbeat', function (Request $request) {
   ]);
 
   // update current state
-  $systemAvailable = $request['hdd-a']['ok']
+  $systemOk = $request['hdd-a']['ok']
     && $request['hdd-b']['ok']
     && $request['encryption']['ok']
     && $request['service-nginx']['ok']
@@ -92,32 +93,18 @@ Route::post('/heartbeat', function (Request $request) {
     && $request['container-dokumente']['ok']
     && $request['container-medien']['ok'];
 
-  $current = CurrentStatus::firstOrCreate([], [
-    'last_heartbeat_at'   => now(),
-    'system_available'    => false,
-  ]);
-  $current->update([
-    'system_available'    => $systemAvailable ? 1 : 0,
-    'thermal_range'       => $request['thermal']['range'],
-    'thermal_temperature' => $request['thermal']['temp'],
-    'hdd_a_ok'            => $request['hdd-a']['ok'] =="true"  ? 1 : 0,
-    'hdd_a_health'        => $request['hdd-a']['health'] =="true"  ? 1 : 0,
-    'hdd_a_free_p'        => $request['hdd-a']['free_p'],
-    'hdd_b_ok'            => $request['hdd-a']['ok'] =="true"  ? 1 : 0,
-    'hdd_b_health'        => $request['hdd-a']['health'] =="true"  ? 1 : 0,
-    'hdd_b_free_p'        => $request['hdd-a']['free_p'],
-    'encryption_ok'       => $request['encryption']['ok'] =="true"  ? 1 : 0,
-    'service_docker_ok'   => $request['service-docker']['ok'] =="true"  ? 1 : 0,
-    'service_nginx_ok'    => $request['service-nginx']['ok'] =="true"  ? 1 : 0,
-    'container_buero_ok'  => $request['container-buero']['ok'] =="true"  ? 1 : 0,
-    'container_medien_ok' => $request['container-medien']['ok'] =="true"  ? 1 : 0,
-    'container_doku_ok'   => $request['container-dokumente']['ok'] =="true"  ? 1 : 0,
+  $tz = config('app.timezone');
+  CurrentStatus::firstOrCreate([], [
+    'last_heartbeat_at'   => now($tz),
+    'system_ok'           => $systemOk ? 1 : 0,
+    'status_json'         => $request->all(),
+    'issues_json'         => [],
   ]);
 
-
+  $ss->run();
 
   return response()->json([
     'status' => 'ok',
-    'message' => $providedToken,
   ]);
+
 });

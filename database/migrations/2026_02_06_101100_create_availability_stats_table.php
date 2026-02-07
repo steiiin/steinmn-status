@@ -13,8 +13,7 @@ return new class extends Migration
     {
         Schema::create('availability_stats', function (Blueprint $table) {
             $table->id();
-            $table->timestamps();
-            $table->date('date');                                // Europe/Berlin Tag
+            $table->date('date')->unique();                                // Europe/Berlin Tag
             $table->integer('avg_response_time_ms')->nullable(); // aus UP-samples
             $table->decimal('availability_p', 5, 4);             // 0..1
             $table->unsignedInteger('samples_total');            // erwartet ~480/Tag bei 3min

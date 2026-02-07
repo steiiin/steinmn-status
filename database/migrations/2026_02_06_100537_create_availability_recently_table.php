@@ -18,6 +18,7 @@ return new class extends Migration
             $table->integer('response_time_ms')->nullable();
             $table->unsignedSmallInteger('response_code')->nullable();
             $table->string('error_kind')->nullable();
+            $table->index('probed_at');
         });
     }
 
