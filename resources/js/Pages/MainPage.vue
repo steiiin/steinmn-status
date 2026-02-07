@@ -77,14 +77,14 @@
 
 <script setup>
 import { VApp, VCard, VCardText, VContainer, VChip } from 'vuetify/components'
-import logo from '../../assets/LogoSteinmn.png'
-import StatusIndicator from './components/StatusIndicator.vue'
-import StatusTracker from './components/StatusTracker.vue'
-import CurrentContainer from './components/CurrentContainer.vue'
-import CurrentComTemp from './components/CurrentComTemp.vue'
-import CurrentComHdd from './components/CurrentComHdd.vue'
-import CurrentComEncryption from './components/CurrentComEncryption.vue'
-import CurrentComService from './components/CurrentComService.vue'
+import logo from '../assets/LogoSteinmn.png'
+import StatusIndicator from '../views/components/StatusIndicator.vue'
+import StatusTracker from '../views/components/StatusTracker.vue'
+import CurrentContainer from '../views/components/CurrentContainer.vue'
+import CurrentComTemp from '../views/components/CurrentComTemp.vue'
+import CurrentComHdd from '../views/components/CurrentComHdd.vue'
+import CurrentComEncryption from '../views/components/CurrentComEncryption.vue'
+import CurrentComService from '../views/components/CurrentComService.vue'
 
 const statusData = [
   { date: '2025-02-10', availability_p: 0.9991, avg_response_time_ms: 210 },
