@@ -42,7 +42,7 @@ class StatusService
     $samplesUp    = (int) $agg->samples_up;
     $avgUpMs      = $agg->avg_up_ms !== null ? (float) $agg->avg_up_ms : null;
 
-    $intervalSeconds = (int) config('monitor.interval_seconds', 60);
+    $intervalSeconds = max(1, (int) config('monitor.interval_seconds', 60));
     $secondsSoFar = CarbonImmutable::now($tz)->diffInSeconds($day);
     $expectedSoFar = max(1, intdiv($secondsSoFar, $intervalSeconds));
 
