@@ -2,7 +2,7 @@
   <div class="container-status-row">
     <div class="overall">
       <StatusIndicator :state="stateColor(state.ok)" size="normal" />
-      <span class="label-large">MEDIEN aktiv.</span>
+      <span class="label-large">MEDIEN {{ state.ok ? 'aktiv' : 'gestört' }}.</span>
     </div>
     <div class="parts">
       <div class="sub-con">

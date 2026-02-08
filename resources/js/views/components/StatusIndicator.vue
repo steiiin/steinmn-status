@@ -92,8 +92,8 @@ const dotStyle = computed(() => `width:${dotSize.value}rem;height:${dotSize.valu
 
 @keyframes dot-breath {
   0% {
-    opacity: 0.1;
-    transform: scale(1.2);
+    opacity: 0;
+    transform: scale(1.0);
   }
   100% {
     opacity: 0.4;
