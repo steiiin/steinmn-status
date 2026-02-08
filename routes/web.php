@@ -20,7 +20,11 @@ Route::get('/', function (Request $request) {
     ->get();
 
   $currentStatus = CurrentStatus::query()
-    ->first();
+    ->latest()
+    ->first([
+      'status_json',
+      'system_ok',
+    ]);
 
   $latestAvailability = RecentAvailability::query()
     ->select([
@@ -35,8 +39,8 @@ Route::get('/', function (Request $request) {
 
   return Inertia::render('MainPage', [
     'performance' => $stats,
-    'internal_check' => $currentStatus->value('status_json'),
-    'internal_ok' => $currentStatus->value('system_ok'),
+    'internal_check' => $currentStatus?->status_json,
+    'internal_ok' => $currentStatus?->system_ok,
     'external_check' => $latestAvailability,
   ]);
 })->name('main');
