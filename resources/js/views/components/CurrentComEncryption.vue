@@ -1,6 +1,6 @@
 <template>
   <v-chip prepend-icon="mdi-lock" label
-    :color="stateColor" variant="elevated">Verschlüsselung</v-chip>
+    :color="stateColor">Verschlüsselung</v-chip>
 </template>
 <script setup>
 import { computed } from 'vue';

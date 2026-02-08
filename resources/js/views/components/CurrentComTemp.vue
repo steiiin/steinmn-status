@@ -1,6 +1,6 @@
 <template>
   <v-chip prepend-icon="mdi-thermometer" label
-    :color="stateColor" variant="elevated">{{ state.temp }}°C</v-chip>
+    :color="stateColor">{{ state.temp }}°C</v-chip>
 </template>
 <script setup>
 import { computed } from 'vue';

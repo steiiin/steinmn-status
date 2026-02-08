@@ -17,10 +17,10 @@
           </template>
           <VCard class="status-tracker__popover" elevation="6">
             <VCardText>
-              <div class="status-tracker__popover-date">{{ formatDate(item.date) }}</div>
-              <div class="status-tracker__popover-body">
-                <div>Online: {{ formatAvailability(item.availability_p) }}</div>
-                <div>Antwortzeit: {{ formatResponseTime(item.avg_response_time_ms) }}</div>
+              <div class="title">{{ formatDate(item.date) }}</div>
+              <div class="info">
+                <div>Online:</div><i>{{ formatAvailability(item.availability_p) }}</i>
+                <div>Antwortzeit:</div><i>{{ formatResponseTime(item.avg_response_time_ms) }}</i>
               </div>
             </VCardText>
           </VCard>
@@ -203,6 +203,25 @@ onBeforeUnmount(() => {
   justify-content: space-between;
   color: #c7c7c7;
   font-size: .9em;
+}
+
+.title {
+  font-size: 1rem;
+  font-weight: 600;
+}
+.info > div {
+  text-transform: uppercase;
+}
+
+.info i {
+  font-style: normal;
+  color: #555;
+}
+
+.info {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: 0.5rem;
 }
 
 </style>
