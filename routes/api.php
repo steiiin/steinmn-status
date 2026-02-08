@@ -84,14 +84,14 @@ Route::post('/heartbeat', function (Request $request, StatusService $ss) {
   ]);
 
   // update current state
-  $systemOk = $request['hdd-a']['ok']
-    && $request['hdd-b']['ok']
-    && $request['encryption']['ok']
-    && $request['service-nginx']['ok']
-    && $request['service-docker']['ok']
-    && $request['container-buero']['ok']
-    && $request['container-dokumente']['ok']
-    && $request['container-medien']['ok'];
+  $systemOk = toBool($request['hdd-a']['ok'])
+    && toBool($request['hdd-b']['ok'])
+    && toBool($request['encryption']['ok'])
+    && toBool($request['service-nginx']['ok'])
+    && toBool($request['service-docker']['ok'])
+    && toBool($request['container-buero']['ok'])
+    && toBool($request['container-dokumente']['ok'])
+    && toBool($request['container-medien']['ok']);
 
   $tz = config('app.timezone');
   $payload = [
@@ -115,3 +115,7 @@ Route::post('/heartbeat', function (Request $request, StatusService $ss) {
   ]);
 
 });
+
+function toBool(string $value) {
+  return $value === "true" ? true : false;
+}
