@@ -3,11 +3,12 @@
 namespace App\Services;
 
 use App\Models\RecentAvailability;
+use App\Models\CurrentStatus;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\Client\ConnectionException;
-use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Mail;
 
 class StatusService
 {
@@ -17,6 +18,7 @@ class StatusService
     $monitorUrl = config('monitor.url');
 
     $headCheck = $this->headCheck($monitorUrl);
+    $this->notifyOnHeadCheck($monitorUrl, $headCheck);
 
     $tz = config('app.timezone');
     RecentAvailability::insert([
@@ -62,6 +64,7 @@ class StatusService
       ['avg_response_time_ms', 'availability_p', 'samples_total', 'samples_up', 'coverage_p']
     );
 
+    $this->notifyOnSystemStatus();
   }
 
   private function headCheck(string $url): array
@@ -126,6 +129,124 @@ class StatusService
         'error'  => 'internal_error',
       ];
     }
+  }
+
+  private function notifyOnHeadCheck(string $url, array $headCheck): void
+  {
+    if (!$headCheck['ok']) {
+      $bodyLines = [
+        'HEAD check failed.',
+        "URL: {$url}",
+        'Status: ' . ($headCheck['status'] ?? 'unknown'),
+        'Error: ' . ($headCheck['error'] ?? 'unknown'),
+        'Response time (ms): ' . ($headCheck['time'] !== null ? number_format($headCheck['time'], 2) : 'unknown'),
+      ];
+      $this->sendAlertEmail('Status monitor HEAD failure', implode("\n", $bodyLines));
+      return;
+    }
+
+    $slowThreshold = (int) config('monitor.slow_server_ms', 1000);
+    if ($headCheck['time'] !== null && $headCheck['time'] > $slowThreshold) {
+      $bodyLines = [
+        'HEAD check slow response.',
+        "URL: {$url}",
+        'Status: ' . ($headCheck['status'] ?? 'unknown'),
+        'Response time (ms): ' . number_format($headCheck['time'], 2),
+        "Slow threshold (ms): {$slowThreshold}",
+      ];
+      $this->sendAlertEmail('Status monitor slow response', implode("\n", $bodyLines));
+    }
+  }
+
+  private function notifyOnSystemStatus(): void
+  {
+    $currentStatus = CurrentStatus::query()->first();
+    if (!$currentStatus || $currentStatus->system_ok) {
+      return;
+    }
+
+    $badParts = $this->collectBadParts($currentStatus->status_json ?? []);
+    $bodyLines = [
+      'System check reported issues.',
+      'Last heartbeat: ' . ($currentStatus->last_heartbeat_at?->toDateTimeString() ?? 'unknown'),
+    ];
+
+    if ($badParts !== []) {
+      $bodyLines[] = 'Bad parts:';
+      foreach ($badParts as $part) {
+        $bodyLines[] = "- {$part}";
+      }
+    }
+
+    $this->sendAlertEmail('Status monitor system check failed', implode("\n", $bodyLines));
+  }
+
+  private function collectBadParts(array $statusJson): array
+  {
+    $badParts = [];
+
+    foreach ($statusJson as $section => $details) {
+      if (!is_array($details)) {
+        continue;
+      }
+
+      foreach ($details as $key => $value) {
+        if ($this->isFalseFlag($value)) {
+          $badParts[] = "{$section}.{$key}";
+        }
+
+        if ($key === 'error' && is_string($value) && $value !== '') {
+          $badParts[] = "{$section}.error: {$value}";
+        }
+      }
+    }
+
+    return $badParts;
+  }
+
+  private function isFalseFlag(mixed $value): bool
+  {
+    if (is_bool($value)) {
+      return $value === false;
+    }
+
+    if (is_string($value)) {
+      return strtolower($value) === 'false';
+    }
+
+    return false;
+  }
+
+  private function sendAlertEmail(string $subject, string $body): void
+  {
+    $recipients = $this->parseRecipients(config('monitor.email_to'));
+    if ($recipients === []) {
+      return;
+    }
+
+    $from = config('monitor.email_from');
+
+    Mail::raw($body, function ($message) use ($recipients, $from, $subject) {
+      $message->to($recipients)->subject($subject);
+
+      if (is_string($from) && $from !== '') {
+        $message->from($from);
+      }
+    });
+  }
+
+  private function parseRecipients(?string $raw): array
+  {
+    if (!is_string($raw) || $raw === '') {
+      return [];
+    }
+
+    $parts = preg_split('/[;,]/', $raw);
+    if ($parts === false) {
+      return [];
+    }
+
+    return array_values(array_filter(array_map('trim', $parts), fn ($value) => $value !== ''));
   }
 
   function classifyTransportFailure(\Throwable $e): string
