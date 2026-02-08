@@ -19,7 +19,7 @@
       </div>
       <div class="sub-con">
         <StatusIndicator :state="stateColor(state.paperless)" size="small" />
-        <span class="label-small">Service-Status</span>
+        <span class="label-small">Anwendung</span>
       </div>
     </div>
   </div>
@@ -74,4 +74,21 @@ const stateColor = (status) => status ? 'green' : 'red'
   font-weight: 600;
   font-size: 1.2rem;
 }
+
+@media only screen and (max-width: 530px) {
+  .container-status-row .overall {
+    width: 15rem;
+  }
+  .label-large {
+    font-size: 1rem;
+  }
+}
+
+@media only screen and (max-width: 385px) {
+  .container-status-row .overall {
+    width: 10rem;
+    padding: .2rem;
+  }
+}
+
 </style>

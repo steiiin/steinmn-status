@@ -130,7 +130,6 @@ onBeforeUnmount(() => {
 }
 
 .main-header--logo {
-  border: 1px solid #fff;
   filter: invert();
 }
 
@@ -140,7 +139,7 @@ onBeforeUnmount(() => {
   width: 100%;
   max-width: 56rem;
   margin: 0 auto;
-  padding: 2rem 1.5rem 4rem;
+  padding: 2rem 1.5rem 2rem;
   background-color: transparent;
 }
 
@@ -194,6 +193,27 @@ hr {
 .label-large {
   font-weight: 600;
   font-size: 1.2rem;
+}
+
+@media only screen and (max-width: 580px) {
+  .content-container {
+    padding: 1rem .75rem 1rem;
+  }
+  .main-header {
+    margin-bottom: 1rem;
+  }
+  .status-card-container {
+    gap: .75rem;
+  }
+}
+
+@media only screen and (max-width: 530px) {
+  .content-container {
+    padding: 1rem 0 1rem;
+  }
+  .status-card-container {
+    gap: .5rem;
+  }
 }
 
 </style>
