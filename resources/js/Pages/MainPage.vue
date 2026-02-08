@@ -101,7 +101,10 @@ const props = defineProps({
 })
 
 const stats_unavailable = computed(() => {
-  return !props.performance || !props.internal_check || !props.external_check || !props.external_ok
+  return props.performance.length==0
+    || !props.internal_check
+    || !props.external_check
+    || props.internal_ok === null
 })
 
 const overallStatus = computed(() => {
