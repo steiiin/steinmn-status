@@ -94,12 +94,19 @@ Route::post('/heartbeat', function (Request $request, StatusService $ss) {
     && $request['container-medien']['ok'];
 
   $tz = config('app.timezone');
-  CurrentStatus::firstOrCreate([], [
+  $payload = [
     'last_heartbeat_at'   => now($tz),
     'system_ok'           => $systemOk ? 1 : 0,
     'status_json'         => $request->all(),
     'issues_json'         => [],
-  ]);
+  ];
+
+  $currentStatus = CurrentStatus::first();
+  if ($currentStatus) {
+    $currentStatus->update($payload);
+  } else {
+    CurrentStatus::create($payload);
+  }
 
   $ss->run();
 
