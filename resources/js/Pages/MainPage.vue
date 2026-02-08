@@ -34,6 +34,45 @@
           </v-card-text>
         </v-card>
         <v-card class="status-card">
+          <v-card-text class="alert-history">
+            <v-card-title class="alert-history__title">Alert-Verlauf</v-card-title>
+            <div v-if="alerts.length === 0" class="alert-history__empty">
+              Keine Alerts vorhanden.
+            </div>
+            <v-timeline v-else align="start" line-inset="12">
+              <v-timeline-item
+                v-for="alert in alerts"
+                :key="alert.id"
+                :dot-color="alertColor(alert)"
+                size="small"
+              >
+                <div class="alert-history__item">
+                  <div class="alert-history__time">
+                    {{ formatAlertTime(alert.alerted_at) }}
+                  </div>
+                  <div class="alert-history__subject">
+                    {{ alert.subject || 'Unbenannter Alert' }}
+                  </div>
+                  <div class="alert-history__body">
+                    {{ formatAlertBody(alert.body) }}
+                  </div>
+                  <div v-if="alert.issues?.length" class="alert-history__issues">
+                    <v-chip
+                      v-for="issue in alert.issues"
+                      :key="issue"
+                      size="small"
+                      variant="outlined"
+                      class="alert-history__chip"
+                    >
+                      {{ issue }}
+                    </v-chip>
+                  </div>
+                </div>
+              </v-timeline-item>
+            </v-timeline>
+          </v-card-text>
+        </v-card>
+        <v-card class="status-card">
           <v-card-text style="display:flex;flex-direction:column;gap:.5rem;">
 
             <current-container title="Server">
@@ -66,7 +105,7 @@
 
 <script setup>
 
-import { VApp, VCard, VCardText, VContainer, VChip } from 'vuetify/components'
+import { VApp, VCard, VCardText, VCardTitle, VContainer, VChip, VTimeline, VTimelineItem } from 'vuetify/components'
 import logo from '../../assets/LogoSteinmn.png'
 import StatusIndicator from '../views/components/StatusIndicator.vue'
 import StatusTracker from '../views/components/StatusTracker.vue'
@@ -98,6 +137,10 @@ const props = defineProps({
   external_check: {
     type: Object,
   },
+  alerts: {
+    type: Array,
+    default: () => [],
+  },
 })
 
 const stats_unavailable = computed(() => {
@@ -127,6 +170,37 @@ const probedDateText = computed(() => {
   return `Extern: ${latestExternal} | Intern: ${latestInternal}`
 
 })
+
+const formatAlertTime = (dateInput) => {
+  if (!dateInput) {
+    return 'Unbekannt'
+  }
+  return absoluteTime(new Date(dateInput))
+}
+
+const formatAlertBody = (body) => {
+  if (!body) {
+    return 'Keine Details.'
+  }
+  const lines = body
+    .split('\n')
+    .map(line => line.trim())
+    .filter(Boolean)
+  if (lines.length === 0) {
+    return 'Keine Details.'
+  }
+  return lines.slice(0, 2).join(' · ')
+}
+
+const alertColor = (alert) => {
+  if (alert?.kind === 'head_check') {
+    return 'orange'
+  }
+  if (alert?.kind === 'system_status') {
+    return 'red'
+  }
+  return 'red'
+}
 
 const refreshIntervalMs = 2 * 60 * 1000
 let refreshIntervalId
@@ -207,6 +281,50 @@ hr {
   gap: 0.75rem;
   margin-bottom: 1rem;
   line-height: 1.1;
+}
+
+.alert-history {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.alert-history__title {
+  padding: 0;
+  font-weight: 600;
+}
+
+.alert-history__empty {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.alert-history__item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.alert-history__time {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.alert-history__subject {
+  font-weight: 600;
+}
+
+.alert-history__body {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.alert-history__issues {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.alert-history__chip {
+  font-size: 0.7rem;
 }
 
 .label-huge {
