@@ -62,7 +62,6 @@ class StatusService
       ['avg_response_time_ms', 'availability_p', 'samples_total', 'samples_up', 'coverage_p']
     );
 
-    echo ("run");
   }
 
   private function headCheck(string $url): array
