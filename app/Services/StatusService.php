@@ -255,8 +255,8 @@ class StatusService
         'Response time (ms): ' . ($headCheck['time'] !== null ? number_format($headCheck['time'], 2) : 'unknown'),
       ];
       $body = implode("\n", $bodyLines);
-      if ($this->sendAlertEmail('Status monitor HEAD failure', $body)) {
-        $this->recordAlert('head_check', $issues, 'Status monitor HEAD failure', $body);
+      if ($this->sendAlertEmail('Status Monitor - Keine Verbindung', $body)) {
+        $this->recordAlert('head_check', $issues, 'Status Monitor - Keine Verbindung', $body);
       }
       return;
     }
@@ -275,8 +275,8 @@ class StatusService
         "Slow threshold (ms): {$slowThreshold}",
       ];
       $body = implode("\n", $bodyLines);
-      if ($this->sendAlertEmail('Status monitor slow response', $body)) {
-        $this->recordAlert('head_check', $issues, 'Status monitor slow response', $body);
+      if ($this->sendAlertEmail('Status Monitor - Lange Antwortzeit', $body)) {
+        $this->recordAlert('head_check', $issues, 'Status Monitor - Lange Antwortzeit', $body);
       }
     }
   }
@@ -306,8 +306,8 @@ class StatusService
     }
 
     $body = implode("\n", $bodyLines);
-    if ($this->sendAlertEmail('Status monitor system check failed', $body)) {
-      $this->recordAlert('system_status', $issues, 'Status monitor system check failed', $body);
+    if ($this->sendAlertEmail('Status Monitor - Fehler beim Selbsttest', $body)) {
+      $this->recordAlert('system_status', $issues, 'Status Monitor - Fehler beim Selbsttest', $body);
     }
   }
 

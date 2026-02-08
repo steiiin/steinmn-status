@@ -34,12 +34,38 @@
           </v-card-text>
         </v-card>
         <v-card class="status-card">
+          <v-card-text style="display:flex;flex-direction:column;gap:.5rem;">
+
+            <current-container title="Server">
+              <current-com-temp :state="internal_check.thermal"></current-com-temp>
+              <current-com-encryption :state="internal_check.encryption"></current-com-encryption>
+            </current-container>
+
+            <current-container title="Festplatten">
+              <current-com-hdd label="HDDa" :state="internal_check['hdd-a']"></current-com-hdd>
+              <current-com-hdd label="HDDb" :state="internal_check['hdd-b']"></current-com-hdd>
+            </current-container>
+
+            <current-container title="Services">
+              <current-com-service label="Docker" icon="docker" :state="internal_check['service-docker']"></current-com-service>
+              <current-com-service label="Proxy" icon="arrow-decision-outline" :state="internal_check['service-nginx']"></current-com-service>
+            </current-container>
+
+            <current-container title="Backup">
+              <current-com-backup label="System" icon="docker" :state="internal_check['backup-system']"></current-com-backup>
+              <current-com-backup label="Extern" icon="arrow-decision-outline" :state="internal_check['backup-external']"></current-com-backup>
+              <current-com-backup label="Lokal" icon="arrow-decision-outline" :state="internal_check['backup-local']"></current-com-backup>
+            </current-container>
+
+          </v-card-text>
+        </v-card>
+
+        <v-card class="status-card" variant="text">
           <v-card-text class="alert-history">
-            <v-card-title class="alert-history__title">Alert-Verlauf</v-card-title>
             <div v-if="alerts.length === 0" class="alert-history__empty">
-              Keine Alerts vorhanden.
+              Keine Alarme vorhanden.
             </div>
-            <v-timeline v-else align="start" line-inset="12">
+            <v-timeline v-else align="start" line-inset="12" line-color="#aaa" fill-dot side="end">
               <v-timeline-item
                 v-for="alert in alerts"
                 :key="alert.id"
@@ -70,32 +96,6 @@
                 </div>
               </v-timeline-item>
             </v-timeline>
-          </v-card-text>
-        </v-card>
-        <v-card class="status-card">
-          <v-card-text style="display:flex;flex-direction:column;gap:.5rem;">
-
-            <current-container title="Server">
-              <current-com-temp :state="internal_check.thermal"></current-com-temp>
-              <current-com-encryption :state="internal_check.encryption"></current-com-encryption>
-            </current-container>
-
-            <current-container title="Festplatten">
-              <current-com-hdd label="HDDa" :state="internal_check['hdd-a']"></current-com-hdd>
-              <current-com-hdd label="HDDb" :state="internal_check['hdd-b']"></current-com-hdd>
-            </current-container>
-
-            <current-container title="Services">
-              <current-com-service label="Docker" icon="docker" :state="internal_check['service-docker']"></current-com-service>
-              <current-com-service label="Proxy" icon="arrow-decision-outline" :state="internal_check['service-nginx']"></current-com-service>
-            </current-container>
-
-            <current-container title="Backup">
-              <current-com-backup label="System" icon="docker" :state="internal_check['backup-system']"></current-com-backup>
-              <current-com-backup label="Extern" icon="arrow-decision-outline" :state="internal_check['backup-external']"></current-com-backup>
-              <current-com-backup label="Lokal" icon="arrow-decision-outline" :state="internal_check['backup-local']"></current-com-backup>
-            </current-container>
-
           </v-card-text>
         </v-card>
       </div>
@@ -194,12 +194,12 @@ const formatAlertBody = (body) => {
 
 const alertColor = (alert) => {
   if (alert?.kind === 'head_check') {
-    return 'orange'
-  }
-  if (alert?.kind === 'system_status') {
     return 'red'
   }
-  return 'red'
+  if (alert?.kind === 'system_status') {
+    return 'blue'
+  }
+  return 'white'
 }
 
 const refreshIntervalMs = 2 * 60 * 1000
