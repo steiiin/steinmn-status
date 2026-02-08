@@ -48,6 +48,12 @@
               <current-com-service label="Proxy" icon="arrow-decision-outline" :state="internal_check['service-nginx']"></current-com-service>
             </current-container>
 
+            <current-container title="Backup">
+              <current-com-backup label="System" icon="docker" :state="internal_check['backup-system']"></current-com-backup>
+              <current-com-backup label="Extern" icon="arrow-decision-outline" :state="internal_check['backup-external']"></current-com-backup>
+              <current-com-backup label="Lokal" icon="arrow-decision-outline" :state="internal_check['backup-local']"></current-com-backup>
+            </current-container>
+
           </v-card-text>
         </v-card>
       </div>
@@ -69,6 +75,8 @@ import CurrentComTemp from '../views/components/CurrentComTemp.vue'
 import CurrentComHdd from '../views/components/CurrentComHdd.vue'
 import CurrentComEncryption from '../views/components/CurrentComEncryption.vue'
 import CurrentComService from '../views/components/CurrentComService.vue'
+import CurrentComBackup from '../views/components/CurrentComBackup.vue'
+
 import { router } from '@inertiajs/vue3'
 import { computed, onBeforeUnmount, onMounted } from 'vue'
 import { absoluteTime } from '../../utils/date'

@@ -1,6 +1,6 @@
 <template>
   <v-chip prepend-icon="mdi-harddisk" label
-    :color="stateColor" variant="elevated"><b>{{ label }}</b></v-chip>
+    :color="stateColor" variant="elevated">{{ label }}</v-chip>
 </template>
 <script setup>
 import { computed } from 'vue';

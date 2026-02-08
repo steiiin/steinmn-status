@@ -1,6 +1,6 @@
 <template>
   <v-chip :prepend-icon="'mdi-'+icon" label
-    :color="stateColor" variant="elevated"><b>{{ label }}</b></v-chip>
+    :color="stateColor" variant="elevated">{{ label }}</v-chip>
 </template>
 <script setup>
 import { computed } from 'vue';
@@ -20,8 +20,6 @@ const props = defineProps({
   },
 })
 
-const stateColor = computed(() => {
-  return props.state.ok ? 'success' : 'error'
-})
+const stateColor = computed(() => props.state.ok ? 'success' : 'error' )
 
 </script>
