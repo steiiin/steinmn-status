@@ -6,7 +6,10 @@
           <img :src="logo">
         </a>
       </header>
-      <div class="status-card-container">
+      <div class="status-empty" v-if="stats_unavailable">
+        Kein Status verfügbar.
+      </div>
+      <div class="status-card-container" v-else>
         <v-card class="status-card">
           <v-card-text class="overall-status-row">
             <StatusIndicator :state="overallStatus.color" size="huge" />
@@ -95,6 +98,10 @@ const props = defineProps({
   external_check: {
     type: Object,
   },
+})
+
+const stats_unavailable = computed(() => {
+  return !props.performance || !props.internal_check || !props.external_check || !props.external_ok
 })
 
 const overallStatus = computed(() => {
@@ -234,4 +241,8 @@ hr {
   }
 }
 
+.status-empty {
+  color: #fff;
+
+}
 </style>
