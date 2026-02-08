@@ -33,53 +33,53 @@ Route::post('/heartbeat', function (Request $request, StatusService $ss) {
 
     'hdd-a' => 'required|array',
     'hdd-a.ts' => 'required|date',
-    'hdd-a.ok' => 'required|in:true,false',
-    'hdd-a.health' => 'required|in:true,false',
+    'hdd-a.ok' => 'required|boolean',
+    'hdd-a.health' => 'required|boolean',
     'hdd-a.error' => 'nullable|in:smartctl_error,smart_failed,attr_pending,attr_offline_uncorrectable,attr_reallocated,selftest_errors',
     'hdd-a.free_p' => 'required|numeric|min:0|max:1',
 
     'hdd-b' => 'required|array',
     'hdd-b.ts' => 'required|date',
-    'hdd-b.ok' => 'required|in:true,false',
-    'hdd-b.health' => 'required|in:true,false',
+    'hdd-b.ok' => 'required|boolean',
+    'hdd-b.health' => 'required|boolean',
     'hdd-b.error' => 'nullable|in:smartctl_error,smart_failed,attr_pending,attr_offline_uncorrectable,attr_reallocated,selftest_errors',
     'hdd-b.free_p' => 'required|numeric|min:0|max:1',
 
     'encryption' => 'required|array',
     'encryption.ts' => 'required|date',
-    'encryption.ok' => 'required|in:true,false',
+    'encryption.ok' => 'required|boolean',
 
     'service-nginx' => 'required|array',
     'service-nginx.ts' => 'required|date',
-    'service-nginx.ok' => 'required|in:true,false',
+    'service-nginx.ok' => 'required|boolean',
     'service-nginx.error' => 'nullable|in:crashed,deactivated',
 
     'service-docker' => 'required|array',
     'service-docker.ts' => 'required|date',
-    'service-docker.ok' => 'required|in:true,false',
+    'service-docker.ok' => 'required|boolean',
     'service-docker.error' => 'nullable|in:crashed,deactivated',
 
     'container-buero' => 'required|array',
     'container-buero.ts' => 'required|date',
-    'container-buero.ok' => 'required|in:true,false',
-    'container-buero.nextcloud' => 'required|in:true,false',
-    'container-buero.nc_db' => 'required|in:true,false',
-    'container-buero.nc_redis' => 'required|in:true,false',
-    'container-buero.nc_base' => 'required|in:true,false',
+    'container-buero.ok' => 'required|boolean',
+    'container-buero.nextcloud' => 'required|boolean',
+    'container-buero.nc_db' => 'required|boolean',
+    'container-buero.nc_redis' => 'required|boolean',
+    'container-buero.nc_base' => 'required|boolean',
 
     'container-dokumente' => 'required|array',
     'container-dokumente.ts' => 'required|date',
-    'container-dokumente.ok' => 'required|in:true,false',
-    'container-dokumente.paperless' => 'required|in:true,false',
-    'container-dokumente.pl_db' => 'required|in:true,false',
-    'container-dokumente.pl_redis' => 'required|in:true,false',
-    'container-dokumente.pl_base' => 'required|in:true,false',
+    'container-dokumente.ok' => 'required|boolean',
+    'container-dokumente.paperless' => 'required|boolean',
+    'container-dokumente.pl_db' => 'required|boolean',
+    'container-dokumente.pl_redis' => 'required|boolean',
+    'container-dokumente.pl_base' => 'required|boolean',
 
     'container-medien' => 'required|array',
     'container-medien.ts' => 'required|date',
-    'container-medien.ok' => 'required|in:true,false',
-    'container-medien.jellyfin' => 'required|in:true,false',
-    'container-medien.jf_base' => 'required|in:true,false',
+    'container-medien.ok' => 'required|boolean',
+    'container-medien.jellyfin' => 'required|boolean',
+    'container-medien.jf_base' => 'required|boolean',
 
   ]);
 
@@ -97,7 +97,7 @@ Route::post('/heartbeat', function (Request $request, StatusService $ss) {
   $payload = [
     'last_heartbeat_at'   => now($tz),
     'system_ok'           => $systemOk ? 1 : 0,
-    'status_json'         => $request->all(),
+    'status_json'         => normalizeBoolValues($request->all()),
     'issues_json'         => [],
   ];
 
@@ -116,6 +116,30 @@ Route::post('/heartbeat', function (Request $request, StatusService $ss) {
 
 });
 
-function toBool(string $value) {
-  return $value === "true" ? true : false;
+function toBool(mixed $value): bool {
+  if (is_bool($value)) {
+    return $value;
+  }
+
+  if (is_string($value)) {
+    return filter_var($value, FILTER_VALIDATE_BOOLEAN);
+  }
+
+  return (bool) $value;
+}
+
+function normalizeBoolValues(mixed $value): mixed {
+  if (is_array($value)) {
+    $normalized = [];
+    foreach ($value as $key => $item) {
+      $normalized[$key] = normalizeBoolValues($item);
+    }
+    return $normalized;
+  }
+
+  if (is_string($value) && ($value === 'true' || $value === 'false')) {
+    return $value === 'true';
+  }
+
+  return $value;
 }
