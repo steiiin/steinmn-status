@@ -196,6 +196,9 @@ hr {
 }
 
 @media only screen and (max-width: 580px) {
+  .label-huge {
+    font-size: 1.2rem;
+  }
   .content-container {
     padding: 1rem .75rem 1rem;
   }
