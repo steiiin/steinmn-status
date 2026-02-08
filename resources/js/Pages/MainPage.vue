@@ -11,7 +11,7 @@
           <v-card-text class="overall-status-row">
             <StatusIndicator :state="overallStatus.color" size="huge" />
             <div style="display:flex;flex-direction:column;">
-              <span class="label-huge" @click="checkko">{{ overallStatus.label }}</span>
+              <span class="label-huge">{{ overallStatus.label }}</span>
               <span class="label-subtitle">Letztes Update: <b>{{ probedDateText }}</b></span>
             </div>
           </v-card-text>
@@ -69,7 +69,8 @@ import CurrentComTemp from '../views/components/CurrentComTemp.vue'
 import CurrentComHdd from '../views/components/CurrentComHdd.vue'
 import CurrentComEncryption from '../views/components/CurrentComEncryption.vue'
 import CurrentComService from '../views/components/CurrentComService.vue'
-import { computed, onMounted } from 'vue'
+import { router } from '@inertiajs/vue3'
+import { computed, onBeforeUnmount, onMounted } from 'vue'
 import { absoluteTime } from '../../utils/date'
 
 const props = defineProps({
@@ -102,13 +103,19 @@ const overallStatus = computed(() => {
 })
 const probedDateText = computed(() => absoluteTime(new Date(props.external_check.probed_at)))
 
-const checkko = () => {
-  console.log(props.internal_check)
-  debugger
-}
+const refreshIntervalMs = 2 * 60 * 1000
+let refreshIntervalId
 
 onMounted(() => {
+  refreshIntervalId = setInterval(() => {
+    router.reload({ preserveScroll: true, preserveState: true })
+  }, refreshIntervalMs)
+})
 
+onBeforeUnmount(() => {
+  if (refreshIntervalId) {
+    clearInterval(refreshIntervalId)
+  }
 })
 
 </script>
