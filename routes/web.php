@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\CurrentStatus;
+use App\Models\Alert;
 use App\Models\RecentAvailability;
 use App\Models\StatsAvailability;
 use Illuminate\Http\Request;
@@ -36,10 +37,24 @@ Route::get('/', function (Request $request) {
     ->latest('probed_at')
     ->first();
 
+  $alerts = Alert::query()
+    ->select([
+      'id',
+      'kind',
+      'issues',
+      'subject',
+      'body',
+      'alerted_at',
+    ])
+    ->latest('alerted_at')
+    ->limit(20)
+    ->get();
+
   return Inertia::render('MainPage', [
     'performance' => $stats,
     'internal_check' => $currentStatus?->status_json,
     'internal_ok' => $currentStatus?->system_ok,
     'external_check' => $latestAvailability,
+    'alerts' => $alerts,
   ]);
 })->name('main');
