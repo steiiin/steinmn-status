@@ -12,7 +12,7 @@
             <StatusIndicator :state="overallStatus.color" size="huge" />
             <div style="display:flex;flex-direction:column;">
               <span class="label-huge">{{ overallStatus.label }}</span>
-              <span class="label-subtitle">Letztes Update: <b>{{ probedDateText }}</b></span>
+              <span class="label-subtitle"><b>{{ probedDateText }}</b></span>
             </div>
           </v-card-text>
         </v-card>
@@ -109,7 +109,14 @@ const overallStatus = computed(() => {
   if (!hddOk || (!!latestResponseTime && latestResponseTime > 1000)) { return { label: 'Server läuft mit Auffälligkeiten.', color: 'yellow' }  }
   return { label: 'Alles in Ordnung.', color: 'green' }
 })
-const probedDateText = computed(() => absoluteTime(new Date(props.external_check.probed_at)))
+const probedDateText = computed(() => {
+
+  const latestExternal = absoluteTime(new Date(props.external_check.probed_at))
+  const dates = Object.values(props.internal_check).map(b => new Date(b.ts)).sort((a, b) => b - a)
+  const latestInternal = dates.length>0 ? absoluteTime(dates[0]) : 'Nie'
+  return `Extern: ${latestExternal} | Intern: ${latestInternal}`
+
+})
 
 const refreshIntervalMs = 2 * 60 * 1000
 let refreshIntervalId
