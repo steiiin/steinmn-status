@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Alert;
 use App\Models\RecentAvailability;
 use App\Models\CurrentStatus;
 use Carbon\CarbonImmutable;
@@ -240,6 +241,12 @@ class StatusService
   private function notifyOnHeadCheck(string $url, array $headCheck): void
   {
     if (!$headCheck['ok']) {
+      $issues = $this->normalizeIssues([
+        'head_check_failed:' . ($headCheck['error'] ?? 'unknown') . ':' . ($headCheck['status'] ?? 'unknown'),
+      ]);
+      if (!$this->shouldSendAlert('head_check', $issues)) {
+        return;
+      }
       $bodyLines = [
         'HEAD check failed.',
         "URL: {$url}",
@@ -247,12 +254,19 @@ class StatusService
         'Error: ' . ($headCheck['error'] ?? 'unknown'),
         'Response time (ms): ' . ($headCheck['time'] !== null ? number_format($headCheck['time'], 2) : 'unknown'),
       ];
-      $this->sendAlertEmail('Status monitor HEAD failure', implode("\n", $bodyLines));
+      $body = implode("\n", $bodyLines);
+      if ($this->sendAlertEmail('Status monitor HEAD failure', $body)) {
+        $this->recordAlert('head_check', $issues, 'Status monitor HEAD failure', $body);
+      }
       return;
     }
 
     $slowThreshold = (int) config('monitor.slow_server_ms', 1000);
     if ($headCheck['time'] !== null && $headCheck['time'] > $slowThreshold) {
+      $issues = $this->normalizeIssues(['head_check_slow']);
+      if (!$this->shouldSendAlert('head_check', $issues)) {
+        return;
+      }
       $bodyLines = [
         'HEAD check slow response.',
         "URL: {$url}",
@@ -260,7 +274,10 @@ class StatusService
         'Response time (ms): ' . number_format($headCheck['time'], 2),
         "Slow threshold (ms): {$slowThreshold}",
       ];
-      $this->sendAlertEmail('Status monitor slow response', implode("\n", $bodyLines));
+      $body = implode("\n", $bodyLines);
+      if ($this->sendAlertEmail('Status monitor slow response', $body)) {
+        $this->recordAlert('head_check', $issues, 'Status monitor slow response', $body);
+      }
     }
   }
 
@@ -272,6 +289,10 @@ class StatusService
     }
 
     $badParts = $this->collectBadParts($currentStatus->status_json ?? []);
+    $issues = $this->normalizeIssues($badParts === [] ? ['system_status_failed'] : $badParts);
+    if (!$this->shouldSendAlert('system_status', $issues)) {
+      return;
+    }
     $bodyLines = [
       'System check reported issues.',
       'Last heartbeat: ' . ($currentStatus->last_heartbeat_at?->toDateTimeString() ?? 'unknown'),
@@ -284,7 +305,10 @@ class StatusService
       }
     }
 
-    $this->sendAlertEmail('Status monitor system check failed', implode("\n", $bodyLines));
+    $body = implode("\n", $bodyLines);
+    if ($this->sendAlertEmail('Status monitor system check failed', $body)) {
+      $this->recordAlert('system_status', $issues, 'Status monitor system check failed', $body);
+    }
   }
 
   private function collectBadParts(array $statusJson): array
@@ -323,11 +347,11 @@ class StatusService
     return false;
   }
 
-  private function sendAlertEmail(string $subject, string $body): void
+  private function sendAlertEmail(string $subject, string $body): bool
   {
     $recipients = $this->parseRecipients(config('monitor.email_to'));
     if ($recipients === []) {
-      return;
+      return false;
     }
 
     $from = config('monitor.email_from');
@@ -339,6 +363,8 @@ class StatusService
         $message->from($from);
       }
     });
+
+    return true;
   }
 
   private function parseRecipients(?string $raw): array
@@ -429,5 +455,46 @@ class StatusService
     }
 
     return $value;
+  }
+
+  private function shouldSendAlert(string $kind, array $issues): bool
+  {
+    $issues = $this->normalizeIssues($issues);
+    if ($issues === []) {
+      return false;
+    }
+
+    $latestAlert = Alert::query()
+      ->where('kind', $kind)
+      ->orderByDesc('alerted_at')
+      ->first();
+
+    if (!$latestAlert) {
+      return true;
+    }
+
+    $previousIssues = $this->normalizeIssues($latestAlert->issues ?? []);
+    $newIssues = array_values(array_diff($issues, $previousIssues));
+
+    return $newIssues !== [];
+  }
+
+  private function recordAlert(string $kind, array $issues, string $subject, string $body): void
+  {
+    $tz = config('app.timezone');
+    Alert::create([
+      'kind' => $kind,
+      'issues' => $this->normalizeIssues($issues),
+      'subject' => $subject,
+      'body' => $body,
+      'alerted_at' => now($tz),
+    ]);
+  }
+
+  private function normalizeIssues(array $issues): array
+  {
+    $normalized = array_values(array_unique(array_filter(array_map('trim', $issues), fn ($value) => $value !== '')));
+    sort($normalized);
+    return $normalized;
   }
 }
