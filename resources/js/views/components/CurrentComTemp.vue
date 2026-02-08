@@ -1,6 +1,6 @@
 <template>
   <v-chip prepend-icon="mdi-thermometer" label
-    :color="stateColor" variant="elevated">{{ state.thermal_temperature }}°C</v-chip>
+    :color="stateColor" variant="elevated">{{ state.temp }}°C</v-chip>
 </template>
 <script setup>
 import { computed } from 'vue';
@@ -13,7 +13,7 @@ const props = defineProps({
 })
 
 const stateColor = computed(() => {
-  const range = props.state.thermal_range
+  const range = props.state.range
   if (range == 'HIGH') { return 'error' }
   if (range == 'MEDIUM') { return 'warning' }
   return 'success'

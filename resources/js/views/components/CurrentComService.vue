@@ -15,14 +15,13 @@ const props = defineProps({
     type: String,
     required: true,
   },
-  ok: {
-    type: Boolean,
-    default: true,
+  state: {
+    type: Object,
   },
 })
 
 const stateColor = computed(() => {
-  return props.ok ? 'success' : 'error'
+  return props.state.ok ? 'success' : 'error'
 })
 
 </script>

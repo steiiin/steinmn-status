@@ -9,63 +9,43 @@
       <div class="status-card-container">
         <v-card class="status-card">
           <v-card-text class="overall-status-row">
-            <StatusIndicator state="green" size="huge" />
+            <StatusIndicator :state="overallStatus.color" size="huge" />
             <div style="display:flex;flex-direction:column;">
-              <span class="label-huge">Alles in Ordnung.</span>
-              <span class="label-subtitle">Letztes Update: <b>Vor 30min</b></span>
+              <span class="label-huge" @click="checkko">{{ overallStatus.label }}</span>
+              <span class="label-subtitle">Letztes Update: <b>{{ probedDateText }}</b></span>
             </div>
           </v-card-text>
         </v-card>
         <v-card class="status-card" style="padding-left: .5rem">
           <v-card-text>
-            <div class="container-status-row">
-              <StatusIndicator state="green" size="normal" />
-              <span class="label-large">BÜRO aktiv.</span>
-            </div>
-            <div class="container-status-row">
-              <StatusIndicator state="green" size="normal" />
-              <span class="label-large">DOKUMENTE aktiv.</span>
-            </div>
-            <div class="container-status-row">
-              <StatusIndicator state="green" size="normal" />
-              <span class="label-large">MEDIEN aktiv.</span>
-            </div>
+            <current-container-buero :state="internal_check['container-buero']"></current-container-buero>
+            <hr>
+            <current-container-doku :state="internal_check['container-dokumente']"></current-container-doku>
+            <hr>
+            <current-container-medien :state="internal_check['container-medien']"></current-container-medien>
           </v-card-text>
         </v-card>
         <v-card class="status-card">
           <v-card-text>
-            <StatusTracker :data="statusData" />
+            <StatusTracker :data="performance" />
           </v-card-text>
         </v-card>
         <v-card class="status-card">
           <v-card-text style="display:flex;flex-direction:column;gap:.5rem;">
 
             <current-container title="Server">
-              <current-com-temp :state="{
-                thermal_range: 'LOW', thermal_temperature: 40
-              }"></current-com-temp>
-              <current-com-encryption :ok="true">
-              </current-com-encryption>
+              <current-com-temp :state="internal_check.thermal"></current-com-temp>
+              <current-com-encryption :state="internal_check.encryption"></current-com-encryption>
             </current-container>
 
             <current-container title="Festplatten">
-              <current-com-hdd label="HDDa" :state="{
-                ok: true, health: true, free_p: 0.19
-              }"></current-com-hdd>
-              <current-com-hdd label="HDDb" :state="{
-                ok: true, health: false, free_p: 0.19
-              }"></current-com-hdd>
+              <current-com-hdd label="HDDa" :state="internal_check['hdd-a']"></current-com-hdd>
+              <current-com-hdd label="HDDb" :state="internal_check['hdd-b']"></current-com-hdd>
             </current-container>
 
             <current-container title="Services">
-              <current-com-service
-                label="Docker" icon="docker"
-                :ok="true">
-              </current-com-service>
-              <current-com-service
-                label="Proxy" icon="arrow-decision-outline"
-                :ok="true">
-              </current-com-service>
+              <current-com-service label="Docker" icon="docker" :state="internal_check['service-docker']"></current-com-service>
+              <current-com-service label="Proxy" icon="arrow-decision-outline" :state="internal_check['service-nginx']"></current-com-service>
             </current-container>
 
           </v-card-text>
@@ -76,23 +56,61 @@
 </template>
 
 <script setup>
+
 import { VApp, VCard, VCardText, VContainer, VChip } from 'vuetify/components'
-import logo from '../assets/LogoSteinmn.png'
+import logo from '../../assets/LogoSteinmn.png'
 import StatusIndicator from '../views/components/StatusIndicator.vue'
 import StatusTracker from '../views/components/StatusTracker.vue'
+import CurrentContainerBuero from '../views/components/CurrentContainerBuero.vue'
+import CurrentContainerDoku from '../views/components/CurrentContainerDoku.vue'
+import CurrentContainerMedien from '../views/components/CurrentContainerMedien.vue'
 import CurrentContainer from '../views/components/CurrentContainer.vue'
 import CurrentComTemp from '../views/components/CurrentComTemp.vue'
 import CurrentComHdd from '../views/components/CurrentComHdd.vue'
 import CurrentComEncryption from '../views/components/CurrentComEncryption.vue'
 import CurrentComService from '../views/components/CurrentComService.vue'
+import { computed, onMounted } from 'vue'
+import { absoluteTime } from '../../utils/date'
 
-const statusData = [
-  { date: '2025-02-10', availability_p: 0.9991, avg_response_time_ms: 210 },
-  { date: '2025-02-09', availability_p: 0.9985, avg_response_time_ms: 240 },
-  { date: '2025-02-08', availability_p: 0.993, avg_response_time_ms: 320 },
-  { date: '2025-02-07', availability_p: 0.987, avg_response_time_ms: 410 },
-  { date: '2025-02-06', availability_p: null, avg_response_time_ms: null },
-]
+const props = defineProps({
+  performance: {
+    type: Array,
+    default: () => [],
+  },
+  internal_check: {
+    type: Object,
+  },
+  internal_ok: {
+    type: Boolean,
+  },
+  external_check: {
+    type: Object,
+  },
+})
+
+const overallStatus = computed(() => {
+  const externalOk = props.external_check.is_available
+  const internalOk = props.internal_ok
+
+  const latestResponseTime = props.external_check.response_time_ms
+  const hddOk = props.internal_check['hdd-a'].health && props.internal_check['hdd-b'].health
+
+  if (!internalOk) { return { label: 'Server meldet Probleme.', color: 'red' } }
+  if (!externalOk) { return { label: 'Server nicht erreichbar.', color: 'red' } }
+  if (!hddOk || (!!latestResponseTime && latestResponseTime > 1000)) { return { label: 'Server läuft mit Auffälligkeiten.', color: 'yellow' }  }
+  return { label: 'Alles in Ordnung.', color: 'green' }
+})
+const probedDateText = computed(() => absoluteTime(new Date(props.external_check.probed_at)))
+
+const checkko = () => {
+  console.log(props.internal_check)
+  debugger
+}
+
+onMounted(() => {
+
+})
+
 </script>
 
 <style scoped>
@@ -106,6 +124,7 @@ const statusData = [
 
 .main-header--logo {
   border: 1px solid #fff;
+  filter: invert();
 }
 
 .content-container {
@@ -144,12 +163,11 @@ const statusData = [
   line-height: 1.1;
 }
 
-.container-status-row {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-  padding: .7rem .75rem;
-  line-height: 1.1;
+hr {
+  border: none;
+  background: #000;
+  height: .1rem;
+  margin: 1rem -1.5rem;
 }
 
 .status-row {

@@ -18,5 +18,9 @@ class StatsAvailability extends Model
     'samples_up',
     'coverage_p'
   ];
-
+  protected $casts = [
+    'avg_response_time_ms' => 'integer',
+    'availability_p' => 'float',
+    'coverage_p' => 'float',
+  ];
 }

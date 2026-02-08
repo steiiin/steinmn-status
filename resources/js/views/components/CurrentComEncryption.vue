@@ -7,13 +7,13 @@ import { computed } from 'vue';
 import { VChip } from 'vuetify/components'
 
 const props = defineProps({
-  ok: {
-    type: Boolean,
+  state: {
+    type: Object,
   },
 })
 
 const stateColor = computed(() => {
-  return props.ok ? 'success' : 'error'
+  return props.state.ok ? 'success' : 'error'
 })
 
 </script>
