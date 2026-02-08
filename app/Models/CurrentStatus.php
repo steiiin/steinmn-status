@@ -13,13 +13,11 @@ class CurrentStatus extends Model
     'last_heartbeat_at',
     'system_ok',
     'status_json',
-    'issues_json',
   ];
 
   protected $casts = [
     'last_heartbeat_at' => 'datetime',
     'system_ok' => 'boolean',
     'status_json' => 'array',
-    'issues_json' => 'array',
   ];
 }

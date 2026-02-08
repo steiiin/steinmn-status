@@ -106,7 +106,6 @@ class StatusService
       'last_heartbeat_at'   => now($tz),
       'system_ok'           => $systemOk ? 1 : 0,
       'status_json'         => $this->normalizeBoolValues($request->all()),
-      'issues_json'         => [],
     ];
 
     $currentStatus = CurrentStatus::first();
