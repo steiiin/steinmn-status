@@ -20,7 +20,6 @@ Route::get('/', function (Request $request) {
     ->get();
 
   $currentStatus = CurrentStatus::query()
-    ->latest()
     ->first([
       'status_json',
       'system_ok',
