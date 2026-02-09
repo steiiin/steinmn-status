@@ -159,7 +159,8 @@ const overallStatus = computed(() => {
 
   if (!internalOk) { return { label: 'Server meldet Probleme.', color: 'red' } }
   if (!externalOk) { return { label: 'Server nicht erreichbar.', color: 'red' } }
-  if (!hddOk || (!!latestResponseTime && latestResponseTime > 1000)) { return { label: 'Server läuft mit Auffälligkeiten.', color: 'yellow' }  }
+  if (!hddOk) { return { label: 'Server läuft, aber HDD meldet Probleme.', color: 'yellow' } }
+  if ((!!latestResponseTime && latestResponseTime > 1000)) { return { label: 'Server läuft langsamer als gewöhnlich.', color: 'yellow' }  }
   return { label: 'Alles in Ordnung.', color: 'green' }
 })
 const probedDateText = computed(() => {
