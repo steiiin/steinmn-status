@@ -55,7 +55,7 @@ const stateDescription = computed(() => {
 
 .info i {
   font-style: normal;
-  color: #555;
+  color: #8c8c8c;
 }
 
 .info {

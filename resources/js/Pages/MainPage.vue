@@ -230,7 +230,7 @@ onBeforeUnmount(() => {
 }
 
 .main-header--logo {
-  filter: invert();
+  /*filter: invert();*/
 }
 
 .content-container {

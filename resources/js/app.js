@@ -10,7 +10,11 @@ const pages = import.meta.glob('./Pages/**/*.vue', { eager: true });
 createInertiaApp({
     resolve: (name) => pages[`./Pages/${name}.vue`],
     setup({ el, App, props, plugin }) {
-        const vuetify = createVuetify();
+        const vuetify = createVuetify({
+            theme: {
+                defaultTheme: 'dark',
+            },
+        });
 
         createApp({ render: () => h(App, props) })
             .use(plugin)

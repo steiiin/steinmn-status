@@ -69,7 +69,7 @@ const freeSpace = computed(() => (props.state.free_p * 100).toFixed(1) )
 
 .info i {
   font-style: normal;
-  color: #555;
+  color: #8c8c8c;
 }
 
 .info {

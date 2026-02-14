@@ -101,6 +101,9 @@ const lineClass = (item) => {
     return 'is-green'
   }
   if (item.availability_p > 0.99) {
+    return 'is-barelygreen'
+  }
+  if (item.availability_p > 0.98) {
     return 'is-yellow'
   }
   return 'is-red'
@@ -171,6 +174,10 @@ onBeforeUnmount(() => {
   background-color: #4caf50;
 }
 
+.status-tracker__line.is-barelygreen {
+  background-color: #94d997;
+}
+
 .status-tracker__line.is-yellow {
   background-color: #f4c430;
 }
@@ -180,7 +187,7 @@ onBeforeUnmount(() => {
 }
 
 .status-tracker__line.is-missing {
-  background-color: #ededed;
+  background-color: #313131;
 }
 
 .status-tracker__popover {
@@ -215,7 +222,7 @@ onBeforeUnmount(() => {
 
 .info i {
   font-style: normal;
-  color: #555;
+  color: #8c8c8c;
 }
 
 .info {
