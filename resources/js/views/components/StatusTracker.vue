@@ -175,7 +175,7 @@ onBeforeUnmount(() => {
 }
 
 .status-tracker__line.is-barelygreen {
-  background-color: #94d997;
+  background-color: #afa94c;
 }
 
 .status-tracker__line.is-yellow {
