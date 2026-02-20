@@ -10,7 +10,9 @@
         <div class="title">Festplatte • {{ label }}</div>
         <div class="info">
           <div>Status:</div><i>{{ stateDescription }}</i>
-          <div>Frei:</div><i>{{ freeSpace }}%</i>
+          <template v-if="state.error!=='not_mount'">
+            <div>Frei:</div><i>{{ freeSpace }}%</i>
+          </template>
         </div>
       </VCardText>
     </VCard>

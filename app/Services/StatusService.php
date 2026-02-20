@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Mail;
 
 class StatusService
 {
+
   public function handleHeartbeat(Request $request): void
   {
     # validate bearer
@@ -40,19 +41,26 @@ class StatusService
       'thermal.temp' => 'required|integer|min:0|max:256',
       'thermal.range' => 'required|in:HIGH,MEDIUM,LOW',
 
-      'hdd-a' => 'required|array',
-      'hdd-a.ts' => 'required|date',
-      'hdd-a.ok' => 'required|in:true,false',
-      'hdd-a.health' => 'required|in:true,false',
-      'hdd-a.error' => 'nullable|in:smartctl_error,smart_failed,attr_pending,attr_offline_uncorrectable,attr_reallocated,selftest_errors',
-      'hdd-a.free_p' => 'required|numeric|min:0|max:1',
+      'disk-main' => 'required|array',
+      'disk-main.ts' => 'required|date',
+      'disk-main.ok' => 'required|in:true,false',
+      'disk-main.health' => 'required|in:true,false',
+      'disk-main.error' => 'nullable|in:not_mount,smartctl_error,smart_failed,attr_pending,attr_offline_uncorrectable,attr_reallocated,selftest_errors',
+      'disk-main.free_p' => 'nullable|numeric|min:0|max:1',
 
-      'hdd-b' => 'required|array',
-      'hdd-b.ts' => 'required|date',
-      'hdd-b.ok' => 'required|in:true,false',
-      'hdd-b.health' => 'required|in:true,false',
-      'hdd-b.error' => 'nullable|in:smartctl_error,smart_failed,attr_pending,attr_offline_uncorrectable,attr_reallocated,selftest_errors',
-      'hdd-b.free_p' => 'required|numeric|min:0|max:1',
+      'disk-cache' => 'required|array',
+      'disk-cache.ts' => 'required|date',
+      'disk-cache.ok' => 'required|in:true,false',
+      'disk-cache.health' => 'required|in:true,false',
+      'disk-cache.error' => 'nullable|in:not_mount,smartctl_error,smart_failed,attr_pending,attr_offline_uncorrectable,attr_reallocated,selftest_errors',
+      'disk-cache.free_p' => 'nullable|numeric|min:0|max:1',
+
+      'disk-backup' => 'required|array',
+      'disk-backup.ts' => 'required|date',
+      'disk-backup.ok' => 'required|in:true,false',
+      'disk-backup.health' => 'required|in:true,false',
+      'disk-backup.error' => 'nullable|in:not_mount,smartctl_error,smart_failed,attr_pending,attr_offline_uncorrectable,attr_reallocated,selftest_errors',
+      'disk-backup.free_p' => 'nullable|numeric|min:0|max:1',
 
       'encryption' => 'required|array',
       'encryption.ts' => 'required|date',
@@ -90,11 +98,26 @@ class StatusService
       'container-medien.jellyfin' => 'required|in:true,false',
       'container-medien.jf_base' => 'required|in:true,false',
 
+      'backup-system' => 'required|array',
+      'backup-system.ts' => 'required|date',
+      'backup-system.ok' => 'required|in:true,false',
+      'backup-system.error' => 'nullable|in:not_available,frozen,old',
+
+      'backup-external' => 'required|array',
+      'backup-external.ts' => 'required|date',
+      'backup-external.ok' => 'required|in:true,false',
+      'backup-external.error' => 'nullable|in:not_available,frozen,old',
+
+      'backup-local' => 'required|array',
+      'backup-local.ts' => 'required|date',
+      'backup-local.ok' => 'required|in:true,false',
+      'backup-local.error' => 'nullable|in:not_available,frozen,old',
+
     ]);
 
     // update current state
-    $systemOk = $this->toBool($request['hdd-a']['ok'])
-      && $this->toBool($request['hdd-b']['ok'])
+    $systemOk = $this->toBool($request['disk-main']['ok'])
+      && $this->toBool($request['disk-backup']['ok'])
       && $this->toBool($request['encryption']['ok'])
       && $this->toBool($request['service-nginx']['ok'])
       && $this->toBool($request['service-docker']['ok'])

@@ -42,8 +42,9 @@
             </current-container>
 
             <current-container title="Festplatten">
-              <current-com-hdd label="HDDa" :state="internal_check['hdd-a']"></current-com-hdd>
-              <current-com-hdd label="HDDb" :state="internal_check['hdd-b']"></current-com-hdd>
+              <current-com-hdd label="HDD(Main)" :state="internal_check['disk-main']"></current-com-hdd>
+              <current-com-hdd label="HDD(Cache)" :state="internal_check['disk-cache']"></current-com-hdd>
+              <current-com-hdd label="HDD(Backup)" :state="internal_check['disk-backup']"></current-com-hdd>
             </current-container>
 
             <current-container title="Services">
@@ -155,7 +156,7 @@ const overallStatus = computed(() => {
   const internalOk = props.internal_ok
 
   const latestResponseTime = props.external_check.response_time_ms
-  const hddOk = props.internal_check['hdd-a'].health && props.internal_check['hdd-b'].health
+  const hddOk = props.internal_check['disk-main'].health && props.internal_check['disk-cache'].health && props.internal_check['disk-backup'].health
 
   if (!internalOk) { return { label: 'Server meldet Probleme.', color: 'red' } }
   if (!externalOk) { return { label: 'Server nicht erreichbar.', color: 'red' } }

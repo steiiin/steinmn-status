@@ -10,7 +10,9 @@
         <div class="title">Backup • {{ label }}</div>
         <div class="info">
           <div>Status:</div><i>{{ stateDescription }}</i>
-          <div>Vom:</div><i>{{ state.birth }}</i>
+          <template v-if="state.error!=='frozen' && state.error!=='not_available'">
+            <div>Vom:</div><i>{{ state.birth }}</i>
+          </template>
         </div>
       </VCardText>
     </VCard>
@@ -42,8 +44,9 @@ const stateColor = computed(() => {
 
 const stateDescription = computed(() => {
   if (!props.state.error) { return 'OK' }
-  if (props.state.error == 'old') { return 'warning' }
-  return 'error'
+  if (props.state.error == 'old') { return 'Veraltet' }
+  if (props.state.error == 'frozen') { return 'Beschädigt' }
+  return 'Nicht Verfügbar'
 })
 
 </script>
